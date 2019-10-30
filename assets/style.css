@@ -26,7 +26,9 @@ h1 {
 }
 
 input {
-    width: 100%;
+    /* width: 100%; */
+    width: 90%;
+    float:left;
 }
 
 .btn {

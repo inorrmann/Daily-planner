@@ -1,46 +1,41 @@
 var hour;
 var inputEl = $('input')
 var inputArr = Array.from(inputEl);
-console.log(inputArr.length);
-console.log(inputArr[1].id);
 
 // when page loads set time on the header, updating every second
 $(document).ready(function () {
     $("#date").text(moment().format("dddd, MMMM Do YYYY, h:mm a"));
     setInterval(function () {
         $("#date").text(moment().format("dddd, MMMM Do YYYY, h:mm a"));
-        // variable updates to determine the color of the calendar
+        // variable updates to determine the color of the calendar, 24 hour format to facilitate comparison
         hour = moment().format("H");
+        //modify hours so the value is comparable to the ids of the array (i.e., starts at 0 for 9am)
         var realHour = parseInt(hour) - 9;
-        console.log(realHour);
-        
+        // console.log(realHour);
+
         // compare the current hour with the id of the input tab
         // change classes: past, present, future
         for (var i = 0; i < inputArr.length; i++) {
+            // literal variable is created by selecting id that matches i
             var el = $(`#${i}`)
+            // to avoid going through every variable in every iteration, only
+            // index zero of variable el (array of all the inputs) is used, and 
+            // hour is extracted to compare with the current time
+            hourId = parseInt(el[0].id)
 
-             console.log(el[0].id)
-             hourId = parseInt(el[0].id)
-             console.log(hourId);
-             console.log(realHour);
-
+            // selects times that have already passed and turns input boxes grey
             if (hourId < realHour) {
                 el.attr("class", "border form-control-lg todo bg-secondary");
-                console.log("running grey");
             }
-
+            // selects current time and turns input box red 
             else if (hourId === realHour) {
                 el.attr("class", "border form-control-lg todo bg-danger");
-                console.log("running red");
             }
-
+            // selects future times and turns input boxes green
             else if (hourId > realHour) {
                 el.attr("class", "border form-control-lg todo bg-success");
-                console.log("running green");
-
             }
         }
-
     }, 1000);
 })
 
@@ -49,79 +44,42 @@ $(document).ready(function () {
 $(".submit").on("click", function () {
     event.preventDefault();
 
-    // !!! THIS IS NOT WORKING !!!
-    // no matter where I click it only registers the id of the first row
-    console.log($("input").attr("id"));
-
-
-    // var task = JSON.parse(localStorage.getItem("task"));
-    // var time = JSON.parse(localStorage.getItem("time"));
-
-    // console.log(task);
+    var task = JSON.parse(localStorage.getItem("task"));
+    var time = JSON.parse(localStorage.getItem("time"));
 
     // if nothing has been recorded yet, then store the values
     // for the current input
-    // if (task === null) {
-    //     time = [{
-    //         time: $(this).parent().attr("value"),
-    //     }];
-    //     task = [{
-    //         todo: $(".todo").val()
-    //     }];
-
-    //     localStorage.setItem("task", JSON.stringify(task));
-    //     localStorage.setItem("time", JSON.stringify(time));
-    // }
-
-    // // if there is previously stored data, push the new data
-    // else {
-    //     var newTask = [{
-    //         todo: $(".todo").val()
-    //     }];
-    //     var newTime = [{
-    //         time: $(this).parent().attr("value"),
-    //     }];
-
-    //     time.push(newTime);
-    //     console.log(time);
-    //     task.push(newTask);
-    //     console.log(task);
-
-    //     localStorage.setItem("task", JSON.stringify(task));
-    //     localStorage.setItem("time", JSON.stringify(time));
-    // }
-
-
-    // // --- THIS IS NOT WORKING ---
-    // WILL NOT PUSH AN OBJECT WITH MORE THAN ONE PROPERTY BUT 
-    // WILL PUSH AN ARRAY WITH ONE PROPERTY
-
-    var task = JSON.parse(localStorage.getItem("tasks"));
-    console.log(task);
-
-    var tasks = []
-    console.log(tasks);
-
     if (task === null) {
-        task = {
+        time = [{
+            // time is stored as the value of the event.target.parentElement
             time: $(this).parent().attr("value"),
-            todo: $(".todo").val()
-        };
-        localStorage.setItem("tasks", JSON.stringify(task));
+        }];
+        task = [{
+            // task is stored as the value of the event.target.previousSibling
+            todo: $(this).prev().val()
+        }];
+
+        localStorage.setItem("task", JSON.stringify(task));
+        localStorage.setItem("time", JSON.stringify(time));
     }
 
+    // if there is previously stored data, push the new data
     else {
         var newTask = {
-            time: $(this).parent().attr("value"),
-            todo: $(".todo").val()
+            todo: $(this).prev().val()
         };
-    }
-    console.log(JSON.stringify(task));
-    console.log(task);
-    console.log(newTask);
+        var newTime = {
+            time: $(this).parent().attr("value"),
+        };
 
-    tasks.push(newTask);
-    console.log(tasks);
+        time.push(newTime);
+        console.log(time);
+        task.push(newTask);
+        console.log(task);
+
+        localStorage.setItem("task", JSON.stringify(task));
+        localStorage.setItem("time", JSON.stringify(time));
+    }
 })
 
 // localStorage.clear()
